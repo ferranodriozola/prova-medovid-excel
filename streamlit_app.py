@@ -1,58 +1,37 @@
 import streamlit as st
 import pandas as pd
-import requests
 
-# --- EL TEU CODI DE CONVERSIÓ ---
-# He creat una funció on has d'enganxar la teva lògica de Python
-def el_meu_codi_python(df):
-    """
-    Aquesta funció rep un DataFrame de Pandas (l'Excel)
-    i retorna el text XML final.
-    """
-    xml_resultat = '<?xml version="1.0" encoding="UTF-8"?>\n<dades>\n'
-    
-    for index, fila in df.iterrows():
-        xml_resultat += f'  <item id="{index}">\n'
-        for col in df.columns:
-            # Aquí personalitza segons el teu XML
-            xml_resultat += f'    <{col}>{fila[col]}</{col}>\n'
-        xml_resultat += '  </item>\n'
-    
-    xml_resultat += '</dades>'
-    return xml_resultat
+# --- CONFIGURACIÓ DE LA PÀGINA ---
+st.set_page_config(page_title="Visor de Dades", page_icon="📊")
 
-# --- CONFIGURACIÓ DE LA PÀGINA WEB ---
-st.set_page_config(page_title="Convertidor Excel a XML", page_icon="🚀")
+st.title("📊 Previsualització de l'Excel")
 
-st.title("🔄 Generador d'XML de l'Equip")
-st.write("Aquesta eina agafa les dades en temps real de Google Sheets i genera l'XML.")
+# 1. ID del teu Google Sheet (extret de la teva URL)
+SHEET_ID = "1FvNGh_SySwgVFaPHBzAxd6EocWnOCPQ-kUTFe1TIWSE"
+# 2. Construïm la URL d'exportació directa a CSV
+URL_CSV = f"https://docs.google.com/spreadsheets/d/{SHEET_ID}/export?format=csv"
 
-# URL del Google Sheet publicat com a CSV
-# Posa aquí la URL que has copiat al pas 1
-URL_SHEET = "https://docs.google.com/spreadsheets/d/1FvNGh_SySwgVFaPHBzAxd6EocWnOCPQ-kUTFe1TIWSE/edit?usp=sharing"
-
-if st.button('Generar XML actualitzat'):
-    with st.spinner('Llegint Google Sheets i processant...'):
+if st.button('Carregar dades de Google Sheets'):
+    with st.spinner('Connectant amb Google Sheets...'):
         try:
-            df = pd.read_csv(URL_SHEET)
+            # Llegim tot el document
+            df = pd.read_csv(URL_CSV)
             
-            resultat_final = el_meu_codi_python(df)
+            # FILTRATGE (A:H és columnes 0 a 8, Files 1:10 és índex 0 a 10)
+            # .iloc[files, columnes]
+            df_filtrat = df.iloc[0:10, 0:8]
             
-            st.success("✅ XML generat correctament!")
+            st.success("Dades carregades correctament!")
             
-            st.subheader("Resultat XML:")
+            # Mostrem la taula a la web
+            # st.dataframe crea una taula interactiva (pots moure columnes, ordenar, etc.)
+            st.subheader("Segment seleccionat (A1:H10):")
+            st.dataframe(df_filtrat, use_container_width=True)
+            
+            # Si prefereixes una taula estàtica i neta, pots fer servir:
+            # st.table(df_filtrat)
 
-            st.code(resultat_final, language='xml')
-            
-            # Opcional: Botó per descarregar el fitxer directament
-            st.download_button(
-                label="Descarregar fitxer .xml",
-                data=resultat_final,
-                file_name="dades_equip.xml",
-                mime="application/xml"
-            )
-            
         except Exception as e:
-            st.error(f"S'ha produït un error: {e}")
+            st.error(f"No s'ha pogut llegir l'arxiu. Revisa que el Sheets estigui 'Publicat a la web'. Error: {e}")
 else:
-    st.info("Fes clic al botó per carregar les dades més recents.")
+    st.info("Prem el botó per veure l'estat actual de l'Excel.")
