@@ -32,7 +32,11 @@ def llegir_full(url_xlsx: str, full: str):
     return pd.read_excel(BytesIO(descarregar_excel(url_xlsx)), sheet_name=full)
 
 
-fulls_disponibles = obtenir_fulls(URL_XLSX)
+fulls_disponibles = obtenir_fulls(URL_XLSX)[:2]
+
+if not fulls_disponibles:
+    st.error("No s'han trobat fulls disponibles a l'Excel.")
+    st.stop()
 
 # 2. Interfície de selecció
 full_seleccionat = st.selectbox("Selecciona el full de l'Excel:", fulls_disponibles)
