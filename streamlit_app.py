@@ -5,10 +5,10 @@ import certifi
 from io import BytesIO
 
 # --- CONFIGURACIÓ DE LA PÀGINA ---
-st.set_page_config(page_title="Eina de Dades Multiformat", page_icon="🛠️")
+st.set_page_config(page_title="Dades", page_icon="🛠️")
 
-st.title("🛠️ Visor de Dades de l'Equip")
-st.write("Tria com vols visualitzar les dades del Google Sheet.")
+st.title("Visor de dades")
+st.write("Tria com visualitzar les dades")
 
 # 1. Configuració de la font de dades
 URL_XLSX = f"https://docs.google.com/spreadsheets/d/{st.secrets['SHEET_ID']}/export?format=xlsx"
@@ -43,7 +43,7 @@ full_seleccionat = st.selectbox("Selecciona el full de l'Excel:", fulls_disponib
 
 opcio = st.radio(
     "Selecciona el format de sortida:",
-    ('Taula Interactiva', 'Text Pla (Còpia ràpida)'),
+    ('Taula', 'Text'),
     index=0
 )
 
@@ -63,14 +63,12 @@ if st.button('Carregar i Convertir'):
             if opcio == 'Taula Interactiva':
                 st.subheader("Visualització en format Taula")
                 st.dataframe(df_filtrat, width='stretch')
-                st.info("Pots clicar a les capçaleres per ordenar les dades.")
             
             else:
                 st.subheader("Visualització en format Text")
                 text_pla = df_filtrat.to_string(index=False)
                 # Fem servir language='text' perquè no ressalti colors estranys
                 st.code(text_pla, language='text')
-                st.info("Usa el botó de la dreta per copiar tot el text al portaretalls.")
 
         except Exception as e:
             st.error(f"S'ha produït un error en la connexió: {e}")
