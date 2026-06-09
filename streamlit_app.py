@@ -317,6 +317,8 @@ def construir_person_xml(fila: pd.Series) -> str:
         attrs_persname.append('type="woman"')
     elif type.lower() == 'fiction':
         attrs_persname.append('type="fiction"')
+    elif type.lower() == 'both':
+        attrs_persname.append('type="fiction" subtype="woman"')
 
 
     refs = [escape(r) for r in (ref, ref_2, ref_3) if r]
